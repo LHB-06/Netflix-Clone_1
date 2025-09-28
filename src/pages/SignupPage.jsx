@@ -1,15 +1,59 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 const Signup = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
+  const navigate = useNavigate(); // 경로 설정
+  const { signup, isLoggedIn } = useAuth(); // 로그인 상태
+  const [email, setEmail] = useState(""); // 이메일 상태 관리
+  const [password, setPassword] = useState(""); // 비밀번호 상태 관리
+  const [passwordConfirm, setPasswordComfirm] = useState(""); // 패스워드 확인
+  const [name, setName] = useState(""); // 이름 상태 관리
+
+  // 이미 로그인한 사용자는 홈으로 리디렉션
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/home");
+    }
+  }, [isLoggedIn, navigate]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Email:", email);
-    console.log("Password:", password);
-    console.log("Name:", name);
+
+    if (!name) {
+      alert("이름을 입력해 주세요.");
+      return;
+    }
+
+    if (!email) {
+      alert("이메일 주소를 입력해주세요.");
+      return;
+    }
+
+    if (!password) {
+      alert("비밀번호를 입력해주세요.");
+      return;
+    }
+
+    if (!passwordConfirm) {
+      alert("비밀번호를 한번 더 입력해 주세요.");
+      return;
+    }
+
+    if (password !== passwordConfirm) {
+      alert("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
+    // 이메일 형식 유효성 검사
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert("올바른 이메일 주소 형식이 아닙니다.");
+      return;
+    }
+
+    // useAuth 훅의 signup 함수 호출
+    signup(name, email, password);
   };
 
   return (
@@ -40,9 +84,16 @@ const Signup = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+        <input
+          type="password"
+          placeholder="비밀번호 확인"
+          className="w-full p-3 mb-4 bg-transparent text-white placeholder-gray-400 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-white-600"
+          value={passwordConfirm}
+          onChange={(e) => setPasswordComfirm(e.target.value)}
+        />
         <button
           type="submit"
-          className="w-full bg-red-600 hover:bg-red-700 p-2 rounded text-white font-semibold "
+          className="w-full bg-red-600 hover:bg-red-700 p-2 rounded text-white font-semibold cursor-pointer"
         >
           등록하기
         </button>

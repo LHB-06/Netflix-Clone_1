@@ -1,17 +1,60 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 const Login = () => {
+  const navigate = useNavigate(); // 경로 이동 설정
+  const location = useLocation(); // homepage 에서 입력한 이메일 주소를 자동으로 채워넣기 위해 필요
+  const { login, isLoggedIn } = useAuth(); // 로그인 상태
   const [email, setEmail] = useState(""); // email 이라는 변수에 상태값을 저장하고, setEmail 이라는 함수로 상태값을 바꾸겠다.
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState(""); // 비밀번호 상태
+
+  // HomePage에서 전달받은 이메일이 있으면 자동으로 채워넣기
+  useEffect(() => {
+    if (location.state?.email) {
+      setEmail(location.state.email);
+    }
+  }, [location.state]);
+
+  // 이미 로그인한 사용자는 홈으로 리디렉션
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/home");
+    }
+  }, [isLoggedIn, navigate]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Email:", email);
-    console.log("Password:", password);
+
+    // 이메일 입력을 안했을 때
+    if (!email) {
+      alert("이메일 주소를 입력해주세요.");
+      return;
+    }
+
+    // 비밀번호를 입력 안했을 때
+    if (!password) {
+      alert("비밀번호를 입력해주세요.");
+      return;
+    }
+
+    // 이메일 형식 유효성 검사
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert("올바른 이메일 주소 형식이 아닙니다.");
+      return;
+    }
+
+    // useAuth 훅의 login 함수 호출
+    login(email, password);
   };
   // handleSubmit 은 Onsubmit 이벤트가 발생할 때 실행되는 함수
   // 즉, 폼 제출 시 해야할 일을 담은 함수
   // Onsubmit 은 입력 완료 후 폼 제출할 때 (버튼을 누르거나 엔터를 누를 때 발생하는 함수)
+
+  const notrealize = () => {
+    alert("기능 미구현 상태입니다.");
+  };
 
   return (
     <div className="h-screen flex justify-center items-center bg-black text-white">
@@ -44,7 +87,7 @@ const Login = () => {
         {/* 로그인 버튼 */}
         <button
           type="submit"
-          className="w-full bg-red-600 hover:bg-red-700 p-3 rounded text-white font-semibold mb-4"
+          className="w-full bg-red-600 hover:bg-red-700 p-3 rounded text-white font-semibold mb-4 cursor-pointer"
         >
           로그인
         </button>
@@ -57,7 +100,8 @@ const Login = () => {
         {/* 로그인 코드 사용하기 버튼 */}
         <button
           type="button"
-          className="w-full bg-gray-700 hover:bg-gray-600 p-3 rounded text-white font-semibold mb-4"
+          className="w-full bg-gray-700 hover:bg-gray-600 p-3 rounded text-white font-semibold mb-4 cursor-pointer"
+          onClick={notrealize}
         >
           로그인 코드 사용하기
         </button>
@@ -67,6 +111,7 @@ const Login = () => {
           <a
             href="#"
             className="text-sm text-white underline hover:text-gray-400"
+            onClick={notrealize}
           >
             비밀번호를 잊으셨나요?
           </a>
