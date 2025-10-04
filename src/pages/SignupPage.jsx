@@ -1,14 +1,39 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { useSelector } from "react-redux";
+import { selectIsLoggedIn } from "../store/authSlice";
 
 const Signup = () => {
   const navigate = useNavigate(); // 경로 설정
-  const { signup, isLoggedIn } = useAuth(); // 로그인 상태
+  const isLoggedIn = useSelector(selectIsLoggedIn); // Redux store에서 로그인 상태를 가져옵니다.
   const [email, setEmail] = useState(""); // 이메일 상태 관리
   const [password, setPassword] = useState(""); // 비밀번호 상태 관리
   const [passwordConfirm, setPasswordComfirm] = useState(""); // 패스워드 확인
   const [name, setName] = useState(""); // 이름 상태 관리
+
+  // 회원가입 로직을 컴포넌트 내부로 이동시킵니다.
+  const handleSignup = (name, email, password) => {
+    try {
+      const users = JSON.parse(localStorage.getItem("users")) || [];
+
+      // 이메일 중복 확인
+      const existingUser = users.find((user) => user.email === email);
+      if (existingUser) {
+        alert("이미 사용 중인 이메일입니다.");
+        return;
+      }
+
+      const newUser = { name, email, password };
+      users.push(newUser);
+      localStorage.setItem("users", JSON.stringify(users));
+
+      alert("회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.");
+      navigate("/login");
+    } catch (error) {
+      console.error("회원가입 처리 중 오류가 발생했습니다.", error);
+      alert("회원가입에 실패했습니다. 다시 시도해주세요.");
+    }
+  };
 
   // 이미 로그인한 사용자는 홈으로 리디렉션
   useEffect(() => {
@@ -52,8 +77,8 @@ const Signup = () => {
       return;
     }
 
-    // useAuth 훅의 signup 함수 호출
-    signup(name, email, password);
+    // 컴포넌트 내의 회원가입 핸들러 함수 호출
+    handleSignup(name, email, password);
   };
 
   return (
@@ -103,7 +128,3 @@ const Signup = () => {
 };
 
 export default Signup;
-
-// export default function SignupPage() {
-//   return <h2>안녕하세요! 여기는 회원가입등록 페이지에요!</h2>;
-// }

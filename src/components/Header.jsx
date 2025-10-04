@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
 const Header = () => {
-  // useAuth 훅을 사용하여 인증 상태와 로그아웃 함수를 가져와서 사용
+  // useAuth 훅을 사용하여 인증 상태와 로그아웃 함수를 간단하게 가져옵니다.
   const { user, isLoggedIn, logout } = useAuth();
 
   return (
@@ -19,7 +19,7 @@ const Header = () => {
         {/* 로그인이 되있는 상태와 안되있는 상태*/}
         {isLoggedIn ? (
           <>
-            <span className="mr-4">{user.name}님, 환영합니다!</span>
+            <span className="mr-4">{user?.name}님, 환영합니다!</span>
             <button onClick={logout} className="mr-4 cursor-pointer">
               Logout
             </button>

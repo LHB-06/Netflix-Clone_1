@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { useDispatch, useSelector } from "react-redux";
+import { loginSuccess, selectIsLoggedIn } from "../store/authSlice";
 
 const Login = () => {
   const navigate = useNavigate(); // 경로 이동 설정
   const location = useLocation(); // homepage 에서 입력한 이메일 주소를 자동으로 채워넣기 위해 필요
-  const { login, isLoggedIn } = useAuth(); // 로그인 상태
+  const dispatch = useDispatch();
+  const isLoggedIn = useSelector(selectIsLoggedIn); // Redux store에서 로그인 상태를 가져옵니다.
   const [email, setEmail] = useState(""); // email 이라는 변수에 상태값을 저장하고, setEmail 이라는 함수로 상태값을 바꾸겠다.
   const [password, setPassword] = useState(""); // 비밀번호 상태
 
@@ -45,8 +47,20 @@ const Login = () => {
       return;
     }
 
-    // useAuth 훅의 login 함수 호출
-    login(email, password);
+    // localStorage에서 사용자 목록을 가져와 로그인 로직을 처리합니다.
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const foundUser = users.find(
+      (user) => user.email === email && user.password === password
+    );
+
+    if (foundUser) {
+      // 로그인 성공 시, Redux 액션을 디스패치합니다.
+      // 보안을 위해 비밀번호는 제외하고 사용자 정보를 전달합니다.
+      const { password, ...userToLogin } = foundUser;
+      dispatch(loginSuccess(userToLogin));
+    } else {
+      alert("이메일 또는 비밀번호가 일치하지 않습니다.");
+    }
   };
   // handleSubmit 은 Onsubmit 이벤트가 발생할 때 실행되는 함수
   // 즉, 폼 제출 시 해야할 일을 담은 함수
@@ -122,7 +136,3 @@ const Login = () => {
 };
 
 export default Login;
-
-// export default function LoginPage() {
-//   return <h2>안녕하세요! 여기는 로그인 페이지에요!</h2>;
-// }

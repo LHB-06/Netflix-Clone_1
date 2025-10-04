@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { useSelector } from "react-redux";
+import { selectIsLoggedIn, selectUser } from "../store/authSlice";
 
 const Home = () => {
   const navigate = useNavigate(); // 경로 이동 설정
-  const { user, isLoggedIn } = useAuth(); // 로그인 상태
+  const user = useSelector(selectUser);
+  const isLoggedIn = useSelector(selectIsLoggedIn);
   const [email, setEmail] = useState(""); // 이메일 상태 관리
 
   const handleSubmit = (e) => {
@@ -40,7 +42,7 @@ const Home = () => {
             {/* 1. 환영 문구 섹션 (중앙 정렬) */}
             <div className="flex flex-col items-center justify-center text-center px-4 py-20">
               <h1 className="text-5xl font-bold mb-6">
-                {user.name}님, 넷플릭스에 오신 것을 환영합니다.
+                {user?.name}님, 넷플릭스에 오신 것을 환영합니다.
               </h1>
               <p className="text-2xl">다양한 영화와 시리즈를 탐색해 보세요.</p>
             </div>
@@ -89,30 +91,3 @@ const Home = () => {
 };
 
 export default Home;
-
-// import React from "react";
-// import { Link } from "react-router-dom";
-
-// const Home = () => {
-//   return (
-//     <div className="relative text-white">
-//       <img
-//         src="/background.jpg"
-//         alt="Netflix Background"
-//         className="w-full h-screen object-cover"
-//       />
-//       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-//         <h1 className="text-5xl font-bold">Welcome to Netflix</h1>
-//         <p className="mt-4">Stream Movies, TV Shows, and More</p>
-//       </div>
-//     </div>
-//   );
-// };
-// export default Home;
-
-// export default function HomePage() {
-//   return <h2>안녕하세요! 여기는 홈 페이지에요!</h2>;
-// }
-
-// default export 방식으로
-// 함수 선언과 export를 축약형으로 작성했습니다.
